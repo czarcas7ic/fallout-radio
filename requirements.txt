@@ -1,0 +1,7 @@
+# Fallout Radio - Production dependencies (Raspberry Pi)
+flask>=3.0.0
+flask-socketio>=5.3.0
+gpiozero>=2.0
+RPi.GPIO>=0.7.1
+pygame>=2.5.0
+yt-dlp>=2024.0.0

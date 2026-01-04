@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Settings - Fallout Radio{% endblock %}
+
+{% block content %}
+<div class="settings-page">
+    <h1>Settings</h1>
+
+    <div class="setting">
+        <label>Default Volume</label>
+        <div class="setting-row">
+            <input type="range" id="default-volume" min="0" max="100" value="50">
+            <span class="setting-value" id="default-volume-value">50</span>
+        </div>
+    </div>
+
+    <div class="setting">
+        <label>Static Volume (%)</label>
+        <div class="setting-row">
+            <input type="range" id="static-volume" min="0" max="100" value="60">
+            <span class="setting-value" id="static-volume-value">60</span>
+        </div>
+    </div>
+
+    <div class="setting">
+        <label>Audio Enhancement</label>
+        <div class="setting-row">
+            <input type="checkbox" id="audio-enhancement" checked>
+            <span class="setting-description">Bass and mid-range boost for fuller sound on small speakers</span>
+        </div>
+    </div>
+
+    <div class="setting">
+        <label>Loudness Normalization</label>
+        <div class="setting-row">
+            <input type="checkbox" id="loudness-normalization">
+            <span class="setting-description">Normalize volume between channels (may cause compression artifacts)</span>
+        </div>
+    </div>
+
+    <button id="save-settings-btn" class="primary">Save Settings</button>
+
+    <div id="settings-status" style="margin-top: 20px; text-align: center;"></div>
+</div>
+{% endblock %}

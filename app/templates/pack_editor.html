@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Pack - Fallout Radio{% endblock %}
+
+{% block content %}
+<div class="pack-editor" data-pack-id="{{ pack_id }}">
+    <div class="pack-header">
+        <input type="text" id="pack-name" class="pack-name-input" placeholder="Pack name...">
+        <button id="save-pack-btn" class="primary">Save</button>
+        <button id="delete-pack-btn" class="danger">Delete Pack</button>
+    </div>
+
+    <h2>Stations</h2>
+    <div class="stations-list" id="stations-list">
+        <div class="loading">Loading stations</div>
+    </div>
+
+    <div class="add-station">
+        <h3>Add Station</h3>
+        <div class="add-station-form">
+            <input type="text" id="new-station-name" placeholder="Station name...">
+            <input type="text" id="new-station-url" placeholder="YouTube URL...">
+            <button id="add-station-btn" class="primary">Add Station</button>
+        </div>
+    </div>
+
+    <a href="/packs" class="back-link">&laquo; Back to Packs</a>
+</div>
+
+<!-- Edit Station Modal -->
+<div class="modal-overlay" id="edit-station-modal">
+    <div class="modal">
+        <h2>Edit Station</h2>
+        <div class="add-station-form">
+            <input type="text" id="edit-station-name" placeholder="Station name...">
+            <input type="text" id="edit-station-url" placeholder="YouTube URL...">
+        </div>
+        <div class="modal-actions">
+            <button id="cancel-edit-btn">Cancel</button>
+            <button id="save-station-btn" class="primary">Save</button>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Station Modal -->
+<div class="modal-overlay" id="delete-station-modal">
+    <div class="modal">
+        <h2>Delete Station?</h2>
+        <p>Are you sure you want to delete "<span id="delete-station-name"></span>"?</p>
+        <div class="modal-actions">
+            <button id="cancel-delete-station-btn">Cancel</button>
+            <button id="confirm-delete-station-btn" class="danger">Delete</button>
+        </div>
+    </div>
+</div>
+{% endblock %}

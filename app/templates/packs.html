@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}Station Packs - Fallout Radio{% endblock %}
+
+{% block content %}
+<div class="packs-page">
+    <h1>Station Packs</h1>
+
+    <div class="packs-list" id="packs-list">
+        <div class="loading">Loading packs</div>
+    </div>
+
+    <div class="create-pack">
+        <input type="text" id="new-pack-name" placeholder="New pack name...">
+        <button id="create-pack-btn" class="primary">Create Pack</button>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal-overlay" id="delete-modal">
+    <div class="modal">
+        <h2>Delete Pack?</h2>
+        <p>Are you sure you want to delete "<span id="delete-pack-name"></span>"?</p>
+        <p>This action cannot be undone.</p>
+        <div class="modal-actions">
+            <button id="cancel-delete-btn">Cancel</button>
+            <button id="confirm-delete-btn" class="danger">Delete</button>
+        </div>
+    </div>
+</div>
+{% endblock %}

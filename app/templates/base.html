@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Fallout Radio{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <nav class="main-nav">
+        <a href="/" class="nav-link {% if request.endpoint == 'index' %}active{% endif %}">Now Playing</a>
+        <a href="/packs" class="nav-link {% if request.endpoint == 'packs_page' %}active{% endif %}">Packs</a>
+        <a href="/settings" class="nav-link {% if request.endpoint == 'settings_page' %}active{% endif %}">Settings</a>
+    </nav>
+
+    <main class="content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

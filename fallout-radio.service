@@ -1,0 +1,18 @@
+[Unit]
+Description=Fallout Radio - Retro Internet Radio
+After=network.target sound.target
+
+[Service]
+Type=simple
+User=pi
+WorkingDirectory=/home/pi/fallout-radio
+Environment="PATH=/home/pi/fallout-radio/venv/bin:/usr/local/bin:/usr/bin:/bin"
+ExecStart=/home/pi/fallout-radio/venv/bin/python -m app.main
+Restart=always
+RestartSec=5
+
+# Give time for audio hardware to initialize
+ExecStartPre=/bin/sleep 2
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,73 @@
+{
+  "packs": [
+    {
+      "id": "fallout",
+      "name": "Fallout Radio",
+      "stations": [
+        {
+          "id": "gnr",
+          "name": "Galaxy News Radio",
+          "url": "https://www.youtube.com/watch?v=9OOBM2ngYL0"
+        },
+        {
+          "id": "mojave",
+          "name": "Mojave Music Radio",
+          "url": "https://www.youtube.com/watch?v=6qQ0TMK7ZuE"
+        },
+        {
+          "id": "diamond-city",
+          "name": "Diamond City Radio",
+          "url": "https://www.youtube.com/watch?v=ASFAuIPg-js"
+        }
+      ]
+    },
+    {
+      "id": "lofi",
+      "name": "Lofi Radio",
+      "stations": [
+        {
+          "id": "lofi-study",
+          "name": "LoFi Study",
+          "url": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+        },
+        {
+          "id": "lofi-synthwave",
+          "name": "LoFi Synthwave",
+          "url": "https://www.youtube.com/watch?v=4xDzrJKXOOY"
+        },
+        {
+          "id": "lofi-jazz",
+          "name": "LoFi Jazz",
+          "url": "https://www.youtube.com/watch?v=HuFYqnbVbzY"
+        },
+        {
+          "id": "lofi-sleep",
+          "name": "LoFi Sleep",
+          "url": "https://www.youtube.com/watch?v=28KRPhVzCus"
+        }
+      ]
+    },
+    {
+      "id": "hiphop",
+      "name": "Hip Hop Radio",
+      "stations": [
+        {
+          "id": "modern-hiphop",
+          "name": "Modern Hip Hop",
+          "url": "https://www.youtube.com/watch?v=r7eFY9YYTdE"
+        },
+        {
+          "id": "rnb",
+          "name": "R&B",
+          "url": "https://www.youtube.com/watch?v=OB67pohCtAQ"
+        },
+        {
+          "id": "old-school-90s",
+          "name": "Old School 90s",
+          "url": "https://www.youtube.com/watch?v=ygwurHw0z78"
+        }
+      ]
+    }
+  ],
+  "active_pack_id": "fallout"
+}

@@ -1,0 +1,957 @@
+/* =============================================================================
+   Fallout Radio - Retro Pip-Boy Style CSS
+   ============================================================================= */
+
+/* Import VT323 font for retro terminal look */
+@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+
+/* =============================================================================
+   CSS Variables
+   ============================================================================= */
+:root {
+    --bg-dark: #0a0a06;
+    --bg-panel: #1a1a0e;
+    --bg-input: #0d0d08;
+    --border-color: #2a3a1a;
+
+    /* Green theme (Pip-Boy) */
+    --text-primary: #00ff41;
+    --text-dim: #00aa2a;
+    --text-bright: #40ff70;
+    --glow-color: rgba(0, 255, 65, 0.4);
+    --glow-strong: rgba(0, 255, 65, 0.8);
+
+    /* Accent colors */
+    --accent-amber: #ffb000;
+    --danger: #ff4444;
+    --danger-dim: #aa2222;
+
+    /* Sizing */
+    --nav-height: 50px;
+    --content-max-width: 800px;
+    --border-radius: 4px;
+}
+
+/* =============================================================================
+   Base Styles
+   ============================================================================= */
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+}
+
+body {
+    font-family: 'VT323', monospace;
+    font-size: 20px;
+    line-height: 1.4;
+    background: var(--bg-dark);
+    color: var(--text-primary);
+    overflow-x: hidden;
+}
+
+/* CRT Scanline Effect */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.15) 0px,
+        rgba(0, 0, 0, 0.15) 1px,
+        transparent 1px,
+        transparent 2px
+    );
+    z-index: 9999;
+}
+
+/* Subtle screen flicker animation */
+@keyframes flicker {
+    0%, 100% { opacity: 1; }
+    92% { opacity: 1; }
+    93% { opacity: 0.95; }
+    94% { opacity: 1; }
+    97% { opacity: 0.98; }
+    98% { opacity: 1; }
+}
+
+body {
+    animation: flicker 8s infinite;
+}
+
+/* =============================================================================
+   Typography
+   ============================================================================= */
+h1, h2, h3 {
+    color: var(--text-primary);
+    text-shadow: 0 0 10px var(--glow-color);
+    margin: 0 0 20px 0;
+    font-weight: normal;
+    letter-spacing: 2px;
+}
+
+h1 { font-size: 36px; }
+h2 { font-size: 28px; }
+h3 { font-size: 22px; }
+
+a {
+    color: var(--text-dim);
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+a:hover {
+    color: var(--text-primary);
+    text-shadow: 0 0 8px var(--glow-color);
+}
+
+/* =============================================================================
+   Navigation
+   ============================================================================= */
+.main-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--nav-height);
+    background: var(--bg-panel);
+    border-bottom: 2px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    z-index: 100;
+}
+
+.nav-link {
+    color: var(--text-dim);
+    font-size: 22px;
+    padding: 10px 20px;
+    margin-right: 10px;
+    border: 1px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.nav-link:hover {
+    color: var(--text-primary);
+    border-color: var(--text-dim);
+}
+
+.nav-link.active {
+    color: var(--text-primary);
+    border-color: var(--text-primary);
+    text-shadow: 0 0 10px var(--glow-color);
+    box-shadow: 0 0 10px var(--glow-color), inset 0 0 20px rgba(0, 255, 65, 0.1);
+}
+
+/* =============================================================================
+   Content Container
+   ============================================================================= */
+.content {
+    padding: calc(var(--nav-height) + 30px) 20px 30px;
+    max-width: var(--content-max-width);
+    margin: 0 auto;
+}
+
+/* =============================================================================
+   Buttons
+   ============================================================================= */
+button, .btn {
+    font-family: 'VT323', monospace;
+    font-size: 20px;
+    background: var(--bg-panel);
+    color: var(--text-primary);
+    border: 2px solid var(--text-dim);
+    padding: 10px 24px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+button:hover, .btn:hover {
+    background: var(--bg-input);
+    border-color: var(--text-primary);
+    text-shadow: 0 0 8px var(--glow-color);
+    box-shadow: 0 0 15px var(--glow-color);
+}
+
+button:active, .btn:active {
+    transform: scale(0.98);
+}
+
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+button.danger {
+    border-color: var(--danger-dim);
+    color: var(--danger);
+}
+
+button.danger:hover {
+    border-color: var(--danger);
+    box-shadow: 0 0 15px rgba(255, 68, 68, 0.4);
+}
+
+button.primary {
+    background: rgba(0, 255, 65, 0.1);
+    border-color: var(--text-primary);
+}
+
+/* =============================================================================
+   Form Inputs
+   ============================================================================= */
+input[type="text"],
+input[type="url"] {
+    font-family: 'VT323', monospace;
+    font-size: 20px;
+    background: var(--bg-input);
+    color: var(--text-primary);
+    border: 2px solid var(--border-color);
+    padding: 10px 15px;
+    width: 100%;
+    transition: all 0.2s ease;
+}
+
+input[type="text"]:focus,
+input[type="url"]:focus {
+    outline: none;
+    border-color: var(--text-dim);
+    box-shadow: 0 0 10px var(--glow-color);
+}
+
+input[type="text"]::placeholder,
+input[type="url"]::placeholder {
+    color: var(--text-dim);
+    opacity: 0.5;
+}
+
+/* Custom Range Slider */
+input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 8px;
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background: var(--text-primary);
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 10px var(--glow-color);
+}
+
+input[type="range"]::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    background: var(--text-primary);
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 10px var(--glow-color);
+}
+
+/* Checkbox */
+input[type="checkbox"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 24px;
+    height: 24px;
+    background: var(--bg-input);
+    border: 2px solid var(--text-dim);
+    cursor: pointer;
+    vertical-align: middle;
+    margin-right: 10px;
+}
+
+input[type="checkbox"]:checked {
+    background: var(--text-primary);
+    box-shadow: 0 0 10px var(--glow-color);
+}
+
+input[type="checkbox"]:checked::after {
+    content: '';
+    display: block;
+    width: 6px;
+    height: 12px;
+    border: solid var(--bg-dark);
+    border-width: 0 3px 3px 0;
+    margin: 2px 0 0 6px;
+    transform: rotate(45deg);
+}
+
+/* =============================================================================
+   Panel / Card Component
+   ============================================================================= */
+.panel {
+    background: var(--bg-panel);
+    border: 2px solid var(--border-color);
+    padding: 20px;
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.panel::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+        135deg,
+        rgba(0, 255, 65, 0.02) 0%,
+        transparent 50%,
+        rgba(0, 255, 65, 0.02) 100%
+    );
+    pointer-events: none;
+}
+
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+/* =============================================================================
+   Initialization Overlay
+   ============================================================================= */
+.init-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(10, 10, 6, 0.95);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 500;
+    transition: opacity 0.5s ease;
+}
+
+.init-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.init-content {
+    text-align: center;
+    padding: 40px;
+}
+
+.init-title {
+    font-size: 32px;
+    color: var(--text-primary);
+    text-shadow: 0 0 20px var(--glow-color);
+    margin-bottom: 30px;
+    letter-spacing: 4px;
+}
+
+.init-progress {
+    width: 300px;
+}
+
+.init-bar {
+    height: 20px;
+    background: var(--bg-input);
+    border: 2px solid var(--text-dim);
+    margin-bottom: 15px;
+    overflow: hidden;
+}
+
+.init-bar-fill {
+    height: 100%;
+    width: 0%;
+    background: var(--text-primary);
+    box-shadow: 0 0 15px var(--glow-color);
+    transition: width 0.3s ease;
+}
+
+.init-status {
+    font-size: 16px;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+}
+
+/* Disabled state for controls during init */
+.now-playing.disabled .controls button,
+.now-playing.disabled .volume-control input {
+    pointer-events: none;
+    opacity: 0.3;
+}
+
+/* =============================================================================
+   Now Playing Page
+   ============================================================================= */
+.now-playing {
+    text-align: center;
+}
+
+#station-display {
+    margin: 30px 0;
+}
+
+.pack-name {
+    font-size: 18px;
+    color: var(--text-dim);
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+}
+
+.station-name {
+    font-size: 42px;
+    color: var(--text-primary);
+    text-shadow: 0 0 20px var(--glow-color);
+    margin-bottom: 15px;
+    min-height: 50px;
+}
+
+.status {
+    font-size: 18px;
+    padding: 8px 20px;
+    display: inline-block;
+    border: 1px solid var(--border-color);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    min-width: 100px;
+    text-align: center;
+}
+
+.status.playing {
+    color: var(--text-primary);
+    border-color: var(--text-primary);
+    box-shadow: 0 0 10px var(--glow-color);
+}
+
+.status.loading {
+    color: var(--accent-amber);
+    border-color: var(--accent-amber);
+    animation: pulse 1s ease-in-out infinite;
+}
+
+.status.stopped {
+    color: var(--text-dim);
+}
+
+.status.error {
+    color: var(--danger);
+    border-color: var(--danger);
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* Tuner Dial */
+.tuner-dial {
+    width: 300px;
+    height: 150px;
+    margin: 40px auto;
+    position: relative;
+    border: 3px solid var(--text-dim);
+    border-radius: 150px 150px 0 0;
+    background: var(--bg-input);
+    overflow: hidden;
+}
+
+.dial-markers {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.dial-marker {
+    position: absolute;
+    width: 2px;
+    height: 15px;
+    background: var(--text-dim);
+    bottom: 0;
+    left: 50%;
+    transform-origin: bottom center;
+}
+
+.dial-marker.active {
+    background: var(--text-primary);
+    box-shadow: 0 0 10px var(--glow-color);
+    height: 25px;
+}
+
+.dial-marker.off {
+    background: var(--danger-dim);
+}
+
+.dial-needle {
+    position: absolute;
+    width: 4px;
+    height: 120px;
+    background: linear-gradient(to top, var(--text-primary), transparent);
+    bottom: 0;
+    left: 50%;
+    margin-left: -2px;
+    transform-origin: bottom center;
+    transition: transform 0.3s ease;
+    box-shadow: 0 0 15px var(--glow-color);
+}
+
+.dial-center {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: var(--text-primary);
+    border-radius: 50%;
+    bottom: -10px;
+    left: 50%;
+    margin-left: -10px;
+    box-shadow: 0 0 15px var(--glow-color);
+}
+
+.dial-labels {
+    position: absolute;
+    width: 100%;
+    bottom: 25px;
+    display: flex;
+    justify-content: space-around;
+    padding: 0 30px;
+    font-size: 14px;
+    color: var(--text-dim);
+}
+
+/* Volume Control */
+.volume-control {
+    margin: 40px auto;
+    max-width: 350px;
+}
+
+.volume-control label {
+    display: block;
+    margin-bottom: 15px;
+    font-size: 18px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.volume-display {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.volume-display input[type="range"] {
+    flex: 1;
+}
+
+#volume-value {
+    font-size: 32px;
+    min-width: 60px;
+    text-align: right;
+    color: var(--text-primary);
+    text-shadow: 0 0 10px var(--glow-color);
+}
+
+/* Controls */
+.controls {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.control-btn {
+    min-width: 100px;
+}
+
+#off-btn {
+    border-color: var(--danger-dim);
+    color: var(--danger);
+}
+
+#off-btn:hover {
+    border-color: var(--danger);
+    box-shadow: 0 0 15px rgba(255, 68, 68, 0.4);
+}
+
+#off-btn.active {
+    background: rgba(255, 68, 68, 0.2);
+}
+
+/* =============================================================================
+   Packs Page
+   ============================================================================= */
+.packs-list {
+    margin-bottom: 30px;
+}
+
+.pack-item {
+    display: flex;
+    align-items: center;
+    padding: 15px 20px;
+    background: var(--bg-panel);
+    border: 2px solid var(--border-color);
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.pack-item:hover {
+    border-color: var(--text-dim);
+}
+
+.pack-item.active {
+    border-color: var(--text-primary);
+    box-shadow: 0 0 15px var(--glow-color);
+}
+
+.pack-item .pack-name {
+    flex: 1;
+    font-size: 24px;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.pack-item .station-count {
+    color: var(--text-dim);
+    margin-right: 20px;
+}
+
+.pack-item .pack-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.pack-item .pack-actions button {
+    padding: 5px 15px;
+    font-size: 16px;
+}
+
+.active-indicator {
+    width: 12px;
+    height: 12px;
+    background: var(--text-primary);
+    border-radius: 50%;
+    margin-right: 15px;
+    box-shadow: 0 0 10px var(--glow-color);
+}
+
+.pack-item:not(.active) .active-indicator {
+    background: var(--border-color);
+    box-shadow: none;
+}
+
+/* Create Pack Form */
+.create-pack {
+    display: flex;
+    gap: 15px;
+    padding: 20px;
+    background: var(--bg-panel);
+    border: 2px solid var(--border-color);
+}
+
+.create-pack input {
+    flex: 1;
+}
+
+/* =============================================================================
+   Pack Editor Page
+   ============================================================================= */
+.pack-editor {
+    max-width: var(--content-max-width);
+}
+
+.pack-header {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+}
+
+.pack-name-input {
+    flex: 1;
+    font-size: 28px;
+    min-width: 200px;
+}
+
+/* Stations List */
+.stations-list {
+    margin-bottom: 30px;
+}
+
+.station-item {
+    display: flex;
+    align-items: center;
+    padding: 15px 20px;
+    background: var(--bg-panel);
+    border: 2px solid var(--border-color);
+    margin-bottom: 10px;
+    gap: 15px;
+}
+
+.station-item:hover {
+    border-color: var(--text-dim);
+}
+
+.drag-handle {
+    cursor: grab;
+    color: var(--text-dim);
+    font-size: 24px;
+    padding: 0 10px;
+}
+
+.drag-handle:hover {
+    color: var(--text-primary);
+}
+
+.station-info {
+    flex: 1;
+}
+
+.station-info .name {
+    font-size: 22px;
+    color: var(--text-primary);
+    margin-bottom: 5px;
+}
+
+.station-info .url {
+    font-size: 14px;
+    color: var(--text-dim);
+    word-break: break-all;
+}
+
+.station-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.station-actions button {
+    padding: 5px 15px;
+    font-size: 16px;
+}
+
+/* Add Station Form */
+.add-station {
+    padding: 20px;
+    background: var(--bg-panel);
+    border: 2px solid var(--border-color);
+}
+
+.add-station h3 {
+    margin-bottom: 15px;
+}
+
+.add-station-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.add-station-form .form-row {
+    display: flex;
+    gap: 15px;
+}
+
+.add-station-form input {
+    flex: 1;
+}
+
+.back-link {
+    display: inline-block;
+    margin-top: 30px;
+    color: var(--text-dim);
+    font-size: 18px;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 40px;
+    color: var(--text-dim);
+}
+
+/* =============================================================================
+   Settings Page
+   ============================================================================= */
+.settings-page {
+    max-width: 500px;
+}
+
+.setting {
+    margin-bottom: 30px;
+    padding: 20px;
+    background: var(--bg-panel);
+    border: 2px solid var(--border-color);
+}
+
+.setting label {
+    display: block;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 15px;
+    font-size: 16px;
+}
+
+.setting-row {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.setting-row input[type="range"] {
+    flex: 1;
+}
+
+.setting-value {
+    font-size: 28px;
+    min-width: 50px;
+    text-align: right;
+    color: var(--text-primary);
+}
+
+.setting.checkbox-setting label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    margin: 0;
+}
+
+#save-settings-btn {
+    width: 100%;
+    margin-top: 20px;
+}
+
+/* =============================================================================
+   Modal / Dialog
+   ============================================================================= */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s ease;
+}
+
+.modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal {
+    background: var(--bg-panel);
+    border: 3px solid var(--text-dim);
+    padding: 30px;
+    max-width: 500px;
+    width: 90%;
+    box-shadow: 0 0 30px var(--glow-color);
+}
+
+.modal h2 {
+    margin-top: 0;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+/* =============================================================================
+   Loading State (for page loading indicators, NOT status badge)
+   ============================================================================= */
+.loading:not(.status) {
+    text-align: center;
+    padding: 40px;
+    color: var(--text-dim);
+}
+
+.loading:not(.status)::after {
+    content: '';
+    animation: dots 1.5s infinite;
+}
+
+@keyframes dots {
+    0%, 20% { content: '.'; }
+    40% { content: '..'; }
+    60%, 100% { content: '...'; }
+}
+
+/* =============================================================================
+   Responsive
+   ============================================================================= */
+@media (max-width: 600px) {
+    body {
+        font-size: 18px;
+    }
+
+    h1 { font-size: 28px; }
+    h2 { font-size: 22px; }
+
+    .main-nav {
+        padding: 0 10px;
+    }
+
+    .nav-link {
+        padding: 10px 12px;
+        font-size: 18px;
+    }
+
+    .content {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    .controls {
+        flex-wrap: wrap;
+    }
+
+    .control-btn {
+        flex: 1;
+        min-width: 80px;
+    }
+
+    .pack-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .station-item {
+        flex-wrap: wrap;
+    }
+
+    .station-actions {
+        width: 100%;
+        margin-top: 10px;
+    }
+}

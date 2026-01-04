@@ -1,0 +1,6 @@
+# Fallout Radio - Development dependencies (macOS/Linux desktop)
+# Excludes Raspberry Pi-specific GPIO libraries
+flask>=3.0.0
+flask-socketio>=5.3.0
+pygame>=2.5.0
+yt-dlp>=2024.0.0
