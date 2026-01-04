@@ -495,8 +495,6 @@ class AudioPlayer:
             "--audio-samplerate=48000",
             "--audio-format=float",
             "--audio-channels=stereo",
-            # EQ for bare drivers: boost bass, mids, and treble to compensate for no enclosure
-            "--af=lavfi=[lowshelf=f=250:g=6,equalizer=f=1000:width_type=o:w=2:g=2,highshelf=f=6000:g=2]",
         ]
 
         # Add start position if specified
