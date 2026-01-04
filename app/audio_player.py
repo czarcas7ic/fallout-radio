@@ -93,7 +93,7 @@ class AudioPlayer:
         self._tuning_sound_path: Optional[Path] = self._find_tuning_sound()
         self._tuning_active: bool = False  # Whether static should be audible
         self._static_volume_percent: int = 60  # Percentage of main volume for static
-        self._audio_preset: str = "small_speaker"  # Current audio preset name
+        self._audio_preset: str = "flat"  # Current audio preset name
 
         # Cache for video durations (url -> duration in seconds)
         # Load from disk for instant startup after first run
@@ -131,10 +131,8 @@ class AudioPlayer:
         cmd = [
             "mpv",
             f"--input-ipc-server={self._tuning_socket_path}",
-            "--ao=pipewire,pulse,alsa",       # Try PipeWire > PulseAudio > ALSA
             "--no-video",
             "--no-terminal",
-            "--audio-channels=stereo",
             "--volume=0",  # Start muted
             "--loop=inf",
             str(self._tuning_sound_path),
@@ -487,30 +485,14 @@ class AudioPlayer:
             if resolved:
                 play_url = resolved
 
-        # Build mpv command
-        # Try PipeWire first (best), then PulseAudio, then ALSA
+        # Build mpv command - minimal settings, let mpv auto-detect everything
         cmd = [
             "mpv",
             f"--input-ipc-server={self._ipc_socket_path}",
-            "--ao=pipewire,pulse,alsa",       # Try PipeWire > PulseAudio > ALSA
             "--no-video",
             "--no-terminal",
             f"--volume={self._volume}",
-            # Audio quality settings
-            "--audio-samplerate=48000",       # Match YouTube's native rate (avoid resampling)
-            "--audio-channels=stereo",        # Explicit stereo output
-            "--audio-format=s16",             # 16-bit signed (standard, no conversion needed)
-            # Buffering settings
-            "--cache=yes",                    # Enable cache for network streams
-            "--demuxer-max-bytes=50MiB",      # Buffer up to 50MB of data
-            "--demuxer-readahead-secs=30",    # Read ahead 30 seconds
-            "--audio-buffer=0.5",             # 500ms audio buffer to prevent underruns
         ]
-
-        # Apply audio preset filters
-        audio_filters = self._get_preset_filters()
-        if audio_filters:
-            cmd.append(f"--af=lavfi=[{','.join(audio_filters)}]")
 
         # Add start position if specified
         if start_position > 0:
@@ -572,10 +554,8 @@ class AudioPlayer:
         cmd = [
             "mpv",
             f"--input-ipc-server={self._tuning_socket_path}",
-            "--ao=pipewire,pulse,alsa",       # Try PipeWire > PulseAudio > ALSA
             "--no-video",
             "--no-terminal",
-            "--audio-channels=stereo",
             f"--volume={tuning_vol}",
         ]
 

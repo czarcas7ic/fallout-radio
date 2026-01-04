@@ -27,134 +27,16 @@ DEFAULT_SETTINGS = {
     "default_volume": 40,
     "static_volume": 60,  # Percentage of main volume (0-100)
     "wrap_stations": True,
-    "audio_preset": "small_speaker",  # Audio EQ preset name
+    "audio_preset": "flat",  # Audio EQ preset name
 }
 
-# Audio presets - each is a list of ffmpeg audio filters
-# These can be changed live without restarting the stream
+# Audio presets - currently disabled, using clean passthrough
+# Keep the structure for future use
 AUDIO_PRESETS = {
     "flat": {
         "name": "Flat (No Processing)",
-        "description": "Pure audio, no EQ or filters",
+        "description": "Pure audio passthrough - no filters applied",
         "filters": [],
-    },
-    "bass_cut": {
-        "name": "Bass Cut Only",
-        "description": "Removes sub-bass rumble, no other changes",
-        "filters": ["highpass=f=100:poles=2"],
-    },
-    "small_speaker": {
-        "name": "Small Speaker",
-        "description": "Optimized for small speakers - cuts rumble, boosts mids",
-        "filters": [
-            "highpass=f=80:poles=2",
-            "equalizer=f=120:width_type=o:w=1.5:g=2",
-            "equalizer=f=300:width_type=o:w=1.5:g=2",
-            "equalizer=f=3000:width_type=o:w=2:g=1",
-        ],
-    },
-    "warm": {
-        "name": "Warm",
-        "description": "Subtle warmth, good for vocals and jazz",
-        "filters": [
-            "highpass=f=60:poles=2",
-            "equalizer=f=200:width_type=o:w=2:g=2",
-            "equalizer=f=400:width_type=o:w=2:g=1",
-        ],
-    },
-    "bright": {
-        "name": "Bright",
-        "description": "Enhanced treble clarity",
-        "filters": [
-            "highpass=f=80:poles=2",
-            "equalizer=f=4000:width_type=o:w=2:g=2",
-            "equalizer=f=8000:width_type=o:w=2:g=1.5",
-        ],
-    },
-    "vocal": {
-        "name": "Vocal Focus",
-        "description": "Emphasizes vocal frequencies",
-        "filters": [
-            "highpass=f=100:poles=2",
-            "equalizer=f=250:width_type=o:w=2:g=-1",
-            "equalizer=f=2000:width_type=o:w=1.5:g=2",
-            "equalizer=f=4000:width_type=o:w=2:g=1",
-        ],
-    },
-    "bass_boost": {
-        "name": "Bass Boost",
-        "description": "For speakers that can handle bass (may distort on small speakers)",
-        "filters": [
-            "equalizer=f=60:width_type=o:w=2:g=4",
-            "equalizer=f=120:width_type=o:w=2:g=2",
-        ],
-    },
-    "lofi": {
-        "name": "Lo-Fi",
-        "description": "Vintage lo-fi sound - rolled off highs and lows",
-        "filters": [
-            "highpass=f=120:poles=2",
-            "lowpass=f=8000:poles=2",
-            "equalizer=f=400:width_type=o:w=2:g=2",
-        ],
-    },
-    "radio": {
-        "name": "Vintage Radio",
-        "description": "Old AM radio style - heavy mid focus",
-        "filters": [
-            "highpass=f=200:poles=2",
-            "lowpass=f=5000:poles=2",
-            "equalizer=f=1000:width_type=o:w=1:g=3",
-        ],
-    },
-    "loudness": {
-        "name": "Loudness (Volume Normalized)",
-        "description": "EBU R128 loudness normalization - may cause compression artifacts",
-        "filters": ["loudnorm=I=-16:TP=-1.5:LRA=11"],
-    },
-    "treble_tame": {
-        "name": "Treble Tame",
-        "description": "Reduces harsh highs - gentle rolloff above 8kHz",
-        "filters": [
-            "highpass=f=80:poles=2",
-            "lowpass=f=12000:poles=2",
-            "equalizer=f=6000:width_type=o:w=2:g=-2",
-        ],
-    },
-    "smooth": {
-        "name": "Smooth",
-        "description": "Soft, rounded sound - cuts harshness at 4-8kHz",
-        "filters": [
-            "highpass=f=80:poles=2",
-            "equalizer=f=4000:width_type=o:w=1.5:g=-3",
-            "equalizer=f=7000:width_type=o:w=2:g=-2",
-            "lowpass=f=14000:poles=1",
-        ],
-    },
-    "deharsh": {
-        "name": "De-Harsh",
-        "description": "Aggressive cut at harsh frequencies (5-7kHz)",
-        "filters": [
-            "highpass=f=80:poles=2",
-            "equalizer=f=5500:width_type=o:w=1:g=-4",
-        ],
-    },
-    "mellow": {
-        "name": "Mellow",
-        "description": "Very soft highs - like listening through a blanket",
-        "filters": [
-            "highpass=f=80:poles=2",
-            "lowpass=f=8000:poles=2",
-        ],
-    },
-    "test_bad": {
-        "name": "TEST - Sounds Terrible",
-        "description": "Intentionally bad - tinny phone speaker simulation",
-        "filters": [
-            "highpass=f=500:poles=2",
-            "lowpass=f=3000:poles=2",
-            "equalizer=f=1000:width_type=o:w=0.5:g=8",
-        ],
     },
 }
 

@@ -135,7 +135,7 @@ class RadioCore:
         self._audio_player.set_static_volume_percent(static_volume)
 
         # Apply audio preset setting
-        audio_preset = self._settings.get("audio_preset", "small_speaker")
+        audio_preset = self._settings.get("audio_preset", "flat")
         self._audio_player.set_audio_preset(audio_preset, apply_live=False)
 
         logger.info(f"Loaded {len(self._packs)} packs, active: {self._active_pack_id}")
