@@ -485,13 +485,14 @@ class AudioPlayer:
             if resolved:
                 play_url = resolved
 
-        # Build mpv command - minimal settings, let mpv auto-detect everything
+        # Build mpv command - minimal settings
         cmd = [
             "mpv",
             f"--input-ipc-server={self._ipc_socket_path}",
             "--no-video",
             "--no-terminal",
             f"--volume={self._volume}",
+            "--audio-samplerate=48000",
         ]
 
         # Add start position if specified
