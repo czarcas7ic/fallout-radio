@@ -112,6 +112,50 @@ AUDIO_PRESETS = {
         "description": "EBU R128 loudness normalization - may cause compression artifacts",
         "filters": ["loudnorm=I=-16:TP=-1.5:LRA=11"],
     },
+    "treble_tame": {
+        "name": "Treble Tame",
+        "description": "Reduces harsh highs - gentle rolloff above 8kHz",
+        "filters": [
+            "highpass=f=80:poles=2",
+            "lowpass=f=12000:poles=2",
+            "equalizer=f=6000:width_type=o:w=2:g=-2",
+        ],
+    },
+    "smooth": {
+        "name": "Smooth",
+        "description": "Soft, rounded sound - cuts harshness at 4-8kHz",
+        "filters": [
+            "highpass=f=80:poles=2",
+            "equalizer=f=4000:width_type=o:w=1.5:g=-3",
+            "equalizer=f=7000:width_type=o:w=2:g=-2",
+            "lowpass=f=14000:poles=1",
+        ],
+    },
+    "deharsh": {
+        "name": "De-Harsh",
+        "description": "Aggressive cut at harsh frequencies (5-7kHz)",
+        "filters": [
+            "highpass=f=80:poles=2",
+            "equalizer=f=5500:width_type=o:w=1:g=-4",
+        ],
+    },
+    "mellow": {
+        "name": "Mellow",
+        "description": "Very soft highs - like listening through a blanket",
+        "filters": [
+            "highpass=f=80:poles=2",
+            "lowpass=f=8000:poles=2",
+        ],
+    },
+    "test_bad": {
+        "name": "TEST - Sounds Terrible",
+        "description": "Intentionally bad - tinny phone speaker simulation",
+        "filters": [
+            "highpass=f=500:poles=2",
+            "lowpass=f=3000:poles=2",
+            "equalizer=f=1000:width_type=o:w=0.5:g=8",
+        ],
+    },
 }
 
 DEFAULT_PACKS_DATA = {
