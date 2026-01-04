@@ -493,6 +493,7 @@ class AudioPlayer:
             "--no-terminal",
             f"--volume={self._volume}",
             "--audio-samplerate=48000",
+            "--audio-format=float",
         ]
 
         # Add start position if specified
