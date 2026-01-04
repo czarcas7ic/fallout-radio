@@ -640,39 +640,10 @@ function initSettingsPage() {
 
     // Save button
     document.getElementById('save-settings-btn')?.addEventListener('click', saveSettings);
-
-    // Apply preset button (applies immediately without saving other settings)
-    document.getElementById('apply-preset-btn')?.addEventListener('click', applyPresetNow);
-
-    // Preset dropdown change - show description
-    const presetSelect = document.getElementById('audio-preset');
-    if (presetSelect) {
-        presetSelect.addEventListener('change', updatePresetDescription);
-    }
 }
-
-// Store presets globally for description lookup
-let audioPresets = {};
 
 async function loadSettings() {
     try {
-        // Load presets first
-        const presetsResponse = await fetch('/api/audio-presets');
-        audioPresets = await presetsResponse.json();
-
-        // Populate preset dropdown
-        const presetSelect = document.getElementById('audio-preset');
-        if (presetSelect) {
-            presetSelect.innerHTML = '';
-            for (const [key, preset] of Object.entries(audioPresets)) {
-                const option = document.createElement('option');
-                option.value = key;
-                option.textContent = preset.name;
-                presetSelect.appendChild(option);
-            }
-        }
-
-        // Load current settings
         const response = await fetch('/api/settings');
         const settings = await response.json();
 
@@ -688,62 +659,23 @@ async function loadSettings() {
         if (staticSlider) staticSlider.value = settings.static_volume ?? 75;
         if (staticValue) staticValue.textContent = settings.static_volume ?? 75;
 
-        // Set current preset
-        if (presetSelect) {
-            presetSelect.value = settings.audio_preset ?? 'small_speaker';
-            updatePresetDescription();
-        }
+        const loudnessCheckbox = document.getElementById('loudness-normalization');
+        if (loudnessCheckbox) loudnessCheckbox.checked = settings.loudness_normalization ?? false;
     } catch (error) {
         console.error('Failed to load settings:', error);
-    }
-}
-
-function updatePresetDescription() {
-    const presetSelect = document.getElementById('audio-preset');
-    const descriptionEl = document.getElementById('audio-preset-description');
-    if (presetSelect && descriptionEl && audioPresets[presetSelect.value]) {
-        descriptionEl.textContent = audioPresets[presetSelect.value].description;
-    }
-}
-
-async function applyPresetNow() {
-    const presetSelect = document.getElementById('audio-preset');
-    const statusEl = document.getElementById('settings-status');
-
-    if (!presetSelect) return;
-
-    try {
-        await fetch('/api/settings', {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ audio_preset: presetSelect.value })
-        });
-
-        if (statusEl) {
-            const presetName = audioPresets[presetSelect.value]?.name || presetSelect.value;
-            statusEl.textContent = `Applied: ${presetName}`;
-            statusEl.style.color = 'var(--text-primary)';
-            setTimeout(() => { statusEl.textContent = ''; }, 3000);
-        }
-    } catch (error) {
-        console.error('Failed to apply preset:', error);
-        if (statusEl) {
-            statusEl.textContent = 'Failed to apply preset';
-            statusEl.style.color = 'var(--danger)';
-        }
     }
 }
 
 async function saveSettings() {
     const volumeSlider = document.getElementById('default-volume');
     const staticSlider = document.getElementById('static-volume');
-    const presetSelect = document.getElementById('audio-preset');
+    const loudnessCheckbox = document.getElementById('loudness-normalization');
     const statusEl = document.getElementById('settings-status');
 
     const settings = {
         default_volume: parseInt(volumeSlider?.value || 50),
         static_volume: parseInt(staticSlider?.value || 75),
-        audio_preset: presetSelect?.value || 'small_speaker'
+        loudness_normalization: loudnessCheckbox?.checked ?? false
     };
 
     try {

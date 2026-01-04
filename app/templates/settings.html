@@ -23,17 +23,14 @@
     </div>
 
     <div class="setting">
-        <label>Audio Preset</label>
-        <div class="setting-row">
-            <select id="audio-preset">
-                <option value="flat">Loading...</option>
-            </select>
-        </div>
-        <div class="setting-description" id="audio-preset-description"></div>
+        <label>
+            <input type="checkbox" id="loudness-normalization">
+            Loudness Normalization
+        </label>
+        <div class="setting-description">Keeps volume consistent across different stations</div>
     </div>
 
     <button id="save-settings-btn" class="primary">Save Settings</button>
-    <button id="apply-preset-btn" class="secondary" style="margin-left: 10px;">Apply Preset Now</button>
 
     <div id="settings-status" style="margin-top: 20px; text-align: center;"></div>
 </div>

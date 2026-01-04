@@ -27,17 +27,7 @@ DEFAULT_SETTINGS = {
     "default_volume": 40,
     "static_volume": 60,  # Percentage of main volume (0-100)
     "wrap_stations": True,
-    "audio_preset": "flat",  # Audio EQ preset name
-}
-
-# Audio presets - currently disabled, using clean passthrough
-# Keep the structure for future use
-AUDIO_PRESETS = {
-    "flat": {
-        "name": "Flat (No Processing)",
-        "description": "Pure audio passthrough - no filters applied",
-        "filters": [],
-    },
+    "loudness_normalization": False,  # Keep volume consistent across stations
 }
 
 DEFAULT_PACKS_DATA = {

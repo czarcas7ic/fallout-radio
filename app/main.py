@@ -233,19 +233,6 @@ def api_update_settings():
     return jsonify(settings)
 
 
-@app.route("/api/audio-presets", methods=["GET"])
-def api_get_audio_presets():
-    """Get available audio presets."""
-    from . import config as cfg
-    presets = {}
-    for key, preset in cfg.AUDIO_PRESETS.items():
-        presets[key] = {
-            "name": preset["name"],
-            "description": preset["description"],
-        }
-    return jsonify(presets)
-
-
 # =============================================================================
 # API: Control
 # =============================================================================
