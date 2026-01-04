@@ -93,8 +93,7 @@ class AudioPlayer:
         self._tuning_sound_path: Optional[Path] = self._find_tuning_sound()
         self._tuning_active: bool = False  # Whether static should be audible
         self._static_volume_percent: int = 60  # Percentage of main volume for static
-        self._loudness_normalization: bool = False  # EBU R128 normalization (off by default)
-        self._audio_enhancement: bool = True  # Bass/mid boost for fuller sound
+        self._audio_preset: str = "small_speaker"  # Current audio preset name
 
         # Cache for video durations (url -> duration in seconds)
         # Load from disk for instant startup after first run
@@ -508,24 +507,8 @@ class AudioPlayer:
             "--audio-buffer=0.5",             # 500ms audio buffer to prevent underruns
         ]
 
-        # Build audio filter chain
-        audio_filters = []
-
-        # Optionally add loudness normalization (can cause compression artifacts)
-        if self._loudness_normalization:
-            audio_filters.append("loudnorm=I=-16:TP=-1.5:LRA=11")
-
-        # Audio enhancement for small speakers
-        if self._audio_enhancement:
-            # High-pass filter: cut sub-bass below 80Hz (small speakers can't reproduce, just causes distortion)
-            audio_filters.append("highpass=f=80:poles=2")
-            # Upper bass boost at 120Hz (+2dB) - frequencies small speakers can handle
-            audio_filters.append("equalizer=f=120:width_type=o:w=1.5:g=2")
-            # Low-mid warmth at 300Hz (+2dB) - adds body without rumble
-            audio_filters.append("equalizer=f=300:width_type=o:w=1.5:g=2")
-            # Presence at 3kHz (+1dB) - clarity and detail
-            audio_filters.append("equalizer=f=3000:width_type=o:w=2:g=1")
-
+        # Apply audio preset filters
+        audio_filters = self._get_preset_filters()
         if audio_filters:
             cmd.append(f"--af=lavfi=[{','.join(audio_filters)}]")
 
@@ -837,15 +820,61 @@ class AudioPlayer:
         self._static_volume_percent = max(0, min(100, percent))
         logger.debug(f"Static volume percent set to {self._static_volume_percent}")
 
-    def set_loudness_normalization(self, enabled: bool) -> None:
-        """Enable or disable EBU R128 loudness normalization."""
-        self._loudness_normalization = enabled
-        logger.debug(f"Loudness normalization set to {enabled}")
+    def _get_preset_filters(self) -> list[str]:
+        """Get the audio filters for the current preset."""
+        preset = config.AUDIO_PRESETS.get(self._audio_preset, {})
+        return preset.get("filters", [])
 
-    def set_audio_enhancement(self, enabled: bool) -> None:
-        """Enable or disable audio enhancement (bass/mid boost)."""
-        self._audio_enhancement = enabled
-        logger.debug(f"Audio enhancement set to {enabled}")
+    def set_audio_preset(self, preset_name: str, apply_live: bool = True) -> bool:
+        """
+        Set the audio preset.
+
+        Args:
+            preset_name: Name of the preset (must exist in AUDIO_PRESETS)
+            apply_live: If True, apply the change immediately to current stream
+
+        Returns:
+            True if preset was set successfully
+        """
+        if preset_name not in config.AUDIO_PRESETS:
+            logger.warning(f"Unknown audio preset: {preset_name}")
+            return False
+
+        self._audio_preset = preset_name
+        logger.info(f"Audio preset set to: {preset_name}")
+
+        if apply_live:
+            self._apply_filters_live()
+
+        return True
+
+    def _apply_filters_live(self) -> bool:
+        """Apply current preset filters to the running stream via IPC."""
+        if not self._mpv_process or self._mpv_process.poll() is not None:
+            logger.debug("No active stream to apply filters to")
+            return False
+
+        filters = self._get_preset_filters()
+
+        if filters:
+            filter_chain = f"lavfi=[{','.join(filters)}]"
+        else:
+            filter_chain = ""
+
+        # Use "af set" to replace all audio filters
+        result = self._send_mpv_command(["af", "set", filter_chain])
+
+        if result and result.get("error") == "success":
+            preset_info = config.AUDIO_PRESETS.get(self._audio_preset, {})
+            logger.info(f"Applied audio preset live: {preset_info.get('name', self._audio_preset)}")
+            return True
+        else:
+            logger.warning(f"Failed to apply filters live: {result}")
+            return False
+
+    def get_audio_preset(self) -> str:
+        """Get the current audio preset name."""
+        return self._audio_preset
 
     def is_playing(self) -> bool:
         """Check if audio is currently playing."""

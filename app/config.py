@@ -27,8 +27,91 @@ DEFAULT_SETTINGS = {
     "default_volume": 40,
     "static_volume": 60,  # Percentage of main volume (0-100)
     "wrap_stations": True,
-    "loudness_normalization": False,  # EBU R128 loudness normalization (causes compression artifacts)
-    "audio_enhancement": True,  # Subtle bass/mid boost for fuller sound on small speakers
+    "audio_preset": "small_speaker",  # Audio EQ preset name
+}
+
+# Audio presets - each is a list of ffmpeg audio filters
+# These can be changed live without restarting the stream
+AUDIO_PRESETS = {
+    "flat": {
+        "name": "Flat (No Processing)",
+        "description": "Pure audio, no EQ or filters",
+        "filters": [],
+    },
+    "bass_cut": {
+        "name": "Bass Cut Only",
+        "description": "Removes sub-bass rumble, no other changes",
+        "filters": ["highpass=f=100:poles=2"],
+    },
+    "small_speaker": {
+        "name": "Small Speaker",
+        "description": "Optimized for small speakers - cuts rumble, boosts mids",
+        "filters": [
+            "highpass=f=80:poles=2",
+            "equalizer=f=120:width_type=o:w=1.5:g=2",
+            "equalizer=f=300:width_type=o:w=1.5:g=2",
+            "equalizer=f=3000:width_type=o:w=2:g=1",
+        ],
+    },
+    "warm": {
+        "name": "Warm",
+        "description": "Subtle warmth, good for vocals and jazz",
+        "filters": [
+            "highpass=f=60:poles=2",
+            "equalizer=f=200:width_type=o:w=2:g=2",
+            "equalizer=f=400:width_type=o:w=2:g=1",
+        ],
+    },
+    "bright": {
+        "name": "Bright",
+        "description": "Enhanced treble clarity",
+        "filters": [
+            "highpass=f=80:poles=2",
+            "equalizer=f=4000:width_type=o:w=2:g=2",
+            "equalizer=f=8000:width_type=o:w=2:g=1.5",
+        ],
+    },
+    "vocal": {
+        "name": "Vocal Focus",
+        "description": "Emphasizes vocal frequencies",
+        "filters": [
+            "highpass=f=100:poles=2",
+            "equalizer=f=250:width_type=o:w=2:g=-1",
+            "equalizer=f=2000:width_type=o:w=1.5:g=2",
+            "equalizer=f=4000:width_type=o:w=2:g=1",
+        ],
+    },
+    "bass_boost": {
+        "name": "Bass Boost",
+        "description": "For speakers that can handle bass (may distort on small speakers)",
+        "filters": [
+            "equalizer=f=60:width_type=o:w=2:g=4",
+            "equalizer=f=120:width_type=o:w=2:g=2",
+        ],
+    },
+    "lofi": {
+        "name": "Lo-Fi",
+        "description": "Vintage lo-fi sound - rolled off highs and lows",
+        "filters": [
+            "highpass=f=120:poles=2",
+            "lowpass=f=8000:poles=2",
+            "equalizer=f=400:width_type=o:w=2:g=2",
+        ],
+    },
+    "radio": {
+        "name": "Vintage Radio",
+        "description": "Old AM radio style - heavy mid focus",
+        "filters": [
+            "highpass=f=200:poles=2",
+            "lowpass=f=5000:poles=2",
+            "equalizer=f=1000:width_type=o:w=1:g=3",
+        ],
+    },
+    "loudness": {
+        "name": "Loudness (Volume Normalized)",
+        "description": "EBU R128 loudness normalization - may cause compression artifacts",
+        "filters": ["loudnorm=I=-16:TP=-1.5:LRA=11"],
+    },
 }
 
 DEFAULT_PACKS_DATA = {

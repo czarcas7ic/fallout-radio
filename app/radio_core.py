@@ -134,13 +134,9 @@ class RadioCore:
         static_volume = self._settings.get("static_volume", 75)
         self._audio_player.set_static_volume_percent(static_volume)
 
-        # Apply loudness normalization setting
-        loudness_norm = self._settings.get("loudness_normalization", False)
-        self._audio_player.set_loudness_normalization(loudness_norm)
-
-        # Apply audio enhancement setting
-        audio_enhancement = self._settings.get("audio_enhancement", True)
-        self._audio_player.set_audio_enhancement(audio_enhancement)
+        # Apply audio preset setting
+        audio_preset = self._settings.get("audio_preset", "small_speaker")
+        self._audio_player.set_audio_preset(audio_preset, apply_live=False)
 
         logger.info(f"Loaded {len(self._packs)} packs, active: {self._active_pack_id}")
 
@@ -799,13 +795,10 @@ class RadioCore:
                 self._settings["static_volume"] = data["static_volume"]
                 self._audio_player.set_static_volume_percent(data["static_volume"])
 
-            if "loudness_normalization" in data:
-                self._settings["loudness_normalization"] = data["loudness_normalization"]
-                self._audio_player.set_loudness_normalization(data["loudness_normalization"])
-
-            if "audio_enhancement" in data:
-                self._settings["audio_enhancement"] = data["audio_enhancement"]
-                self._audio_player.set_audio_enhancement(data["audio_enhancement"])
+            if "audio_preset" in data:
+                self._settings["audio_preset"] = data["audio_preset"]
+                # apply_live=True so the preset takes effect immediately
+                self._audio_player.set_audio_preset(data["audio_preset"], apply_live=True)
 
             self._save_settings()
             logger.info(f"Updated settings: {data}")
