@@ -340,9 +340,10 @@ journalctl -u fallout-radio -f
 ### Physical Controls
 
 - **Station Encoder**: Rotate to switch stations (button does nothing)
-- **Volume Encoder**: Rotate to adjust volume. Power is controlled by volume:
+- **Volume Encoder**: Rotate to adjust volume, press to cycle through packs
   - Turn volume to 0 → Radio turns off
   - Turn volume up from 0 → Radio turns on (resumes last station)
+  - Press button → Switch to next pack (wraps from last to first)
 
 ## Configuration
 

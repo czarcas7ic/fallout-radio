@@ -646,6 +646,30 @@ class RadioCore:
 
             return True
 
+    def next_pack(self) -> bool:
+        """
+        Cycle to the next pack. Wraps from last to first.
+
+        Returns:
+            True if successful, False if no packs available
+        """
+        with self._lock:
+            if not self._packs:
+                return False
+
+            # Find current pack index
+            current_idx = 0
+            for i, pack in enumerate(self._packs):
+                if pack.id == self._active_pack_id:
+                    current_idx = i
+                    break
+
+            # Cycle to next pack (wrap around)
+            next_idx = (current_idx + 1) % len(self._packs)
+            next_pack = self._packs[next_idx]
+
+        return self.set_active_pack(next_pack.id)
+
     def set_active_pack(self, pack_id: str) -> bool:
         """
         Set the active pack.
