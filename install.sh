@@ -38,6 +38,7 @@ sudo apt-get install -y \
     python3 \
     python3-pip \
     python3-venv \
+    python3-lgpio \
     mpv \
     libsdl2-mixer-2.0-0 \
     git
