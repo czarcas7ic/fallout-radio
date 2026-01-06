@@ -677,6 +677,9 @@ async function loadSettings() {
 
         const loudnessCheckbox = document.getElementById('loudness-normalization');
         if (loudnessCheckbox) loudnessCheckbox.checked = settings.loudness_normalization ?? false;
+
+        const autoStartCheckbox = document.getElementById('auto-start');
+        if (autoStartCheckbox) autoStartCheckbox.checked = settings.auto_start ?? true;
     } catch (error) {
         console.error('Failed to load settings:', error);
     }
@@ -687,13 +690,15 @@ async function saveSettings() {
     const maxVolumeSlider = document.getElementById('max-volume');
     const staticSlider = document.getElementById('static-volume');
     const loudnessCheckbox = document.getElementById('loudness-normalization');
+    const autoStartCheckbox = document.getElementById('auto-start');
     const statusEl = document.getElementById('settings-status');
 
     const settings = {
         default_volume: parseInt(volumeSlider?.value || 50),
         max_volume: parseInt(maxVolumeSlider?.value || 100),
         static_volume: parseInt(staticSlider?.value || 75),
-        loudness_normalization: loudnessCheckbox?.checked ?? false
+        loudness_normalization: loudnessCheckbox?.checked ?? false,
+        auto_start: autoStartCheckbox?.checked ?? true
     };
 
     try {

@@ -385,7 +385,8 @@ Settings are stored in `data/settings.json`:
 - `max_volume`: Maximum volume limit (1-100), default: 100. Use to protect low-wattage speakers (e.g., 60 for a 1.6W speaker with 3W amp)
 - `static_volume`: Tuning static volume as percentage of main volume (0-100), default: 60
 - `wrap_stations`: Whether to wrap around when reaching first/last station, default: true
-- `loudness_normalization`: EBU R128 loudness normalization for consistent volume across stations, default: true
+- `loudness_normalization`: EBU R128 loudness normalization for consistent volume across stations, default: false
+- `auto_start`: Automatically start playing when the radio powers on, default: true
 
 ## API Reference
 

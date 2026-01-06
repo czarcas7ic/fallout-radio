@@ -213,7 +213,12 @@ class RadioCore:
         thread.start()
 
     def _auto_start_playback(self) -> None:
-        """Auto-start playback on boot if there are stations available."""
+        """Auto-start playback on boot if enabled and stations available."""
+        # Check if auto-start is enabled
+        if not self._settings.get("auto_start", True):
+            logger.info("Auto-start disabled in settings")
+            return
+
         active_pack = self._get_pack_by_id(self._active_pack_id) if self._active_pack_id else None
         if not active_pack or not active_pack.stations:
             logger.info("No stations available - skipping auto-start")
@@ -915,6 +920,9 @@ class RadioCore:
             if "loudness_normalization" in data:
                 self._settings["loudness_normalization"] = data["loudness_normalization"]
                 self._audio_player.set_loudness_normalization(data["loudness_normalization"])
+
+            if "auto_start" in data:
+                self._settings["auto_start"] = data["auto_start"]
 
             self._save_settings()
             logger.info(f"Updated settings: {data}")

@@ -29,6 +29,7 @@ DEFAULT_SETTINGS = {
     "static_volume": 60,  # Percentage of main volume (0-100)
     "wrap_stations": True,
     "loudness_normalization": False,  # Keep volume consistent across stations
+    "auto_start": True,  # Automatically start playing on boot
 }
 
 DEFAULT_PACKS_DATA = {
