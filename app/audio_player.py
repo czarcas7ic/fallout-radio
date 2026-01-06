@@ -82,6 +82,9 @@ class AudioPlayer:
         # Callback for status changes (used to notify WebSocket clients)
         self._status_callback: Optional[callable] = None
 
+        # Callback for when playback ends naturally (EOF, not error)
+        self._playback_ended_callback: Optional[callable] = None
+
         # Set up sounds directory
         if sounds_dir is None:
             sounds_dir = Path(__file__).parent / "static" / "sounds"
@@ -202,6 +205,10 @@ class AudioPlayer:
         """Set a callback to be called when playback status changes."""
         self._status_callback = callback
 
+    def set_playback_ended_callback(self, callback: callable) -> None:
+        """Set a callback to be called when playback ends naturally (EOF)."""
+        self._playback_ended_callback = callback
+
     def _notify_status_change(self) -> None:
         """Notify the callback of a status change."""
         if self._status_callback:
@@ -280,6 +287,8 @@ class AudioPlayer:
                 break
             time.sleep(0.1)
 
+        eof_reached = False
+
         while not self._stop_monitor.is_set():
             if self._mpv_process is None:
                 break
@@ -288,9 +297,21 @@ class AudioPlayer:
             if self._mpv_process.poll() is not None:
                 with self._status_lock:
                     if self._status != StreamStatus.STOPPED:
-                        self._status = StreamStatus.ERROR
-                        logger.warning("mpv process exited unexpectedly")
-                self._notify_status_change()
+                        if eof_reached:
+                            # Normal end of playback
+                            logger.info("Playback ended (EOF reached)")
+                            self._status = StreamStatus.STOPPED
+                            self._notify_status_change()
+                            # Notify callback in a separate thread to avoid blocking
+                            if self._playback_ended_callback:
+                                threading.Thread(
+                                    target=self._playback_ended_callback,
+                                    daemon=True
+                                ).start()
+                        else:
+                            self._status = StreamStatus.ERROR
+                            logger.warning("mpv process exited unexpectedly")
+                            self._notify_status_change()
                 break
 
             # Query playback status
@@ -298,6 +319,7 @@ class AudioPlayer:
             buffering = self._send_mpv_command(["get_property", "paused-for-cache"])
             idle = self._send_mpv_command(["get_property", "core-idle"])
             time_pos = self._send_mpv_command(["get_property", "time-pos"])
+            eof = self._send_mpv_command(["get_property", "eof-reached"])
 
             old_status = self._status
 
@@ -305,6 +327,10 @@ class AudioPlayer:
             is_buffering = buffering and buffering.get("data") is True
             is_idle = idle and idle.get("data") is True
             has_position = time_pos and time_pos.get("data") is not None and time_pos.get("data") > 0
+
+            # Track if EOF has been reached (for when process exits)
+            if eof and eof.get("data") is True:
+                eof_reached = True
 
             with self._status_lock:
                 if is_paused or is_buffering or is_idle or not has_position:
