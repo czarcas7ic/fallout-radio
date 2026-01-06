@@ -206,8 +206,23 @@ class RadioCore:
             self._notify_state_change()
             logger.info("Prefetch complete - all stations ready")
 
+            # Auto-start playback on boot
+            self._auto_start_playback()
+
         thread = threading.Thread(target=fetch_all, daemon=True)
         thread.start()
+
+    def _auto_start_playback(self) -> None:
+        """Auto-start playback on boot if there are stations available."""
+        active_pack = self._get_pack_by_id(self._active_pack_id) if self._active_pack_id else None
+        if not active_pack or not active_pack.stations:
+            logger.info("No stations available - skipping auto-start")
+            return
+
+        # Only auto-start if radio is currently off
+        if self._current_station_index == 0:
+            logger.info("Auto-starting playback on boot")
+            self.switch_to_station(1)
 
     def _get_virtual_position(self, url: str) -> float:
         """

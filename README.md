@@ -12,6 +12,7 @@ A Raspberry Pi-powered internet radio that streams YouTube audio through a vinta
 - Tuning sound effects when switching stations
 - EBU R128 loudness normalization for consistent volume across stations
 - Smart caching for fast station switching and startup
+- Auto-start playback on boot (turn volume to 0 to turn off)
 
 ## Hardware Requirements
 
