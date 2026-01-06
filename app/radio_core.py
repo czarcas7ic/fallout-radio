@@ -87,6 +87,8 @@ class RadioCore:
         self._active_pack_id: Optional[str] = None
         self._current_station_index: int = 0  # 0 = OFF, 1+ = station
         self._settings: dict = {}
+        self._max_volume: int = 100  # Cached for quick access
+        self._last_station_before_off: int = 1  # Remember station when turning off via volume
 
         # Callbacks for state changes (used by WebSocket)
         self._state_change_callbacks: list[Callable[[], None]] = []
@@ -127,8 +129,12 @@ class RadioCore:
         # Load settings
         self._settings = config.load_settings()
 
-        # Apply default volume
+        # Apply max volume setting
+        self._max_volume = self._settings.get("max_volume", 100)
+
+        # Apply default volume (capped at max_volume)
         default_volume = self._settings.get("default_volume", 30)
+        default_volume = min(default_volume, self._max_volume)
         self._audio_player.set_volume(default_volume)
 
         # Apply static volume setting
@@ -489,7 +495,41 @@ class RadioCore:
     # === Volume Control ===
 
     def set_volume(self, level: int) -> None:
-        """Set the volume level (0-100)."""
+        """
+        Set the volume level (0 to max_volume).
+
+        Volume-based power control:
+        - Setting volume to 0 turns the radio off
+        - Setting volume above 0 while off turns the radio on
+        """
+        # Clamp to valid range (0 to max_volume)
+        level = max(0, min(self._max_volume, level))
+
+        current_volume = self._audio_player.get_volume()
+        is_on = self._current_station_index > 0
+
+        # Volume-based power control
+        if level == 0 and is_on:
+            # Turning off via volume - save current station for later
+            self._last_station_before_off = self._current_station_index
+            self._audio_player.set_volume(0)
+            self.switch_to_station(0)
+            return
+        elif level > 0 and not is_on:
+            # Turning on via volume - restore last station
+            self._audio_player.set_volume(level)
+            target_station = self._last_station_before_off
+            # Validate station still exists
+            active_pack = self._get_pack_by_id(self._active_pack_id) if self._active_pack_id else None
+            max_station = len(active_pack.stations) if active_pack else 0
+            if target_station < 1 or target_station > max_station:
+                target_station = 1 if max_station > 0 else 0
+            if target_station > 0:
+                self.switch_to_station(target_station)
+            self._notify_state_change()
+            return
+
+        # Normal volume change
         self._audio_player.set_volume(level)
         self._notify_state_change()
 
@@ -819,6 +859,15 @@ class RadioCore:
         with self._lock:
             if "default_volume" in data:
                 self._settings["default_volume"] = data["default_volume"]
+
+            if "max_volume" in data:
+                new_max = max(1, min(100, data["max_volume"]))  # Clamp 1-100
+                self._settings["max_volume"] = new_max
+                self._max_volume = new_max
+                # If current volume exceeds new max, lower it
+                current_vol = self._audio_player.get_volume()
+                if current_vol > new_max:
+                    self._audio_player.set_volume(new_max)
 
             if "static_volume" in data:
                 self._settings["static_volume"] = data["static_volume"]

@@ -25,6 +25,7 @@ DURATION_CACHE_FILE = DATA_DIR / "duration_cache.json"
 # Default configurations
 DEFAULT_SETTINGS = {
     "default_volume": 40,
+    "max_volume": 100,  # Maximum volume limit (0-100), for speaker protection
     "static_volume": 60,  # Percentage of main volume (0-100)
     "wrap_stations": True,
     "loudness_normalization": False,  # Keep volume consistent across stations

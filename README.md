@@ -16,8 +16,8 @@ A Raspberry Pi-powered internet radio that streams YouTube audio through a vinta
 ## Hardware Requirements
 
 - Raspberry Pi (3B+ or newer recommended)
-- 2x MAX98357A I2S DAC amplifiers (stereo setup)
-- 2x Speakers (4-8 ohm)
+- MAX98357A I2S DAC amplifier (mono setup)
+- Speaker (4-8 ohm, 1.6W+ rating)
 - 2x Rotary encoders with push buttons (optional)
 - Vintage radio chassis (for aesthetics)
 
@@ -25,14 +25,14 @@ A Raspberry Pi-powered internet radio that streams YouTube audio through a vinta
 
 ### Components
 
-| Component       | Model               | Notes                              |
-| --------------- | ------------------- | ---------------------------------- |
-| Raspberry Pi    | Zero 2 W (or 3B+/4) | Any Pi with GPIO and WiFi          |
-| I2S DAC/Amp     | MAX98357A x2        | Stereo setup, 3W per channel       |
-| Speakers        | 3" 4Ω x2            | 3W or higher power handling each   |
-| Station Encoder | KY-040              | Rotary encoder with push button    |
-| Volume Encoder  | KY-040              | Rotary encoder with push button    |
-| Power Supply    | 5V 2.5A+            | Micro USB or USB-C depending on Pi |
+| Component       | Model               | Notes                                      |
+| --------------- | ------------------- | ------------------------------------------ |
+| Raspberry Pi    | Zero 2 W (or 3B+/4) | Any Pi with GPIO and WiFi                  |
+| I2S DAC/Amp     | MAX98357A           | Mono setup, 3W max output                  |
+| Speaker         | 4Ω 1.6W             | Vintage radio speaker (keep volume < 60%)  |
+| Station Encoder | KY-040              | Rotary encoder with push button            |
+| Volume Encoder  | KY-040              | Rotary encoder with push button            |
+| Power Supply    | 5V 2.5A+            | Micro USB or USB-C depending on Pi         |
 
 ### Pin Reference Diagram
 
@@ -64,41 +64,33 @@ Volume DT ──── GPIO26  (37)  (38) GPIO20 ─── Volume SW
                     GND (39)  (40) GPIO21 ─── MAX98357A DIN
 ```
 
-### Wiring: MAX98357A I2S DAC (Stereo Setup)
+### Wiring: MAX98357A I2S DAC (Mono Setup)
 
-Two MAX98357A boards are used for stereo audio. Both boards share the I2S signals, with the SD/GAIN pin selecting left or right channel.
+A single MAX98357A board configured for mono output (L+R mixed).
 
 ```
                         Raspberry Pi
                         ────────────
-LEFT DAC (MAX98357A)
+MAX98357A
    VIN  ─────────────── Pin 2 or 4 (5V)
    GND  ─────────────── Pin 34 (GND)
    DIN  ─────────────── Pin 40 (GPIO 21 / PCM_DOUT)
   BCLK  ─────────────── Pin 12 (GPIO 18 / PCM_CLK)
    LRC  ─────────────── Pin 35 (GPIO 19 / PCM_FS)
-    SD  ─────────────── GND (selects LEFT channel)
-
-RIGHT DAC (MAX98357A)
-   VIN  ─────────────── Pin 2 or 4 (5V)
-   GND  ─────────────── Pin 34 (GND)
-   DIN  ─────────────── Pin 40 (GPIO 21 / PCM_DOUT)  ← shared
-  BCLK  ─────────────── Pin 12 (GPIO 18 / PCM_CLK)   ← shared
-   LRC  ─────────────── Pin 35 (GPIO 19 / PCM_FS)    ← shared
-    SD  ─────────────── VIN (selects RIGHT channel)
+    SD  ─────────────── Not connected (floating = mono L+R mix)
 ```
 
-**Stereo Channel Selection:**
+**SD Pin Channel Selection (reference):**
 
+- SD pin floating = Mono (L+R mixed) ← recommended for vintage radio
 - SD pin to GND = Left channel only
 - SD pin to VIN = Right channel only
-- SD pin floating = Mono (L+R mixed)
 
-**Speaker Connections:**
+**Speaker Connection:**
 
-- Solder left speaker to the `+` and `-` terminals on the LEFT DAC
-- Solder right speaker to the `+` and `-` terminals on the RIGHT DAC
-- Use 4-8Ω speakers rated for at least 3W each
+- Solder vintage speaker to the `+` and `-` terminals on the MAX98357A
+- Use 4-8Ω speaker
+- Keep volume below 60% if using a 1.6W speaker (MAX98357A outputs up to 3W)
 
 ### Wiring: Station Rotary Encoder (KY-040)
 
@@ -132,13 +124,12 @@ KY-040 Encoder     Raspberry Pi
 
 | Component           | Pin  | Raspberry Pi Pin | GPIO    |
 | ------------------- | ---- | ---------------- | ------- |
-| Both DACs VIN       | VIN  | Pin 2 or 4       | 5V      |
-| Both DACs GND       | GND  | Pin 34           | GND     |
-| Both DACs DIN       | DIN  | Pin 40           | GPIO 21 |
-| Both DACs BCLK      | BCLK | Pin 12           | GPIO 18 |
-| Both DACs LRC       | LRC  | Pin 35           | GPIO 19 |
-| Left DAC SD         | SD   | Pin 34           | GND     |
-| Right DAC SD        | SD   | Pin 2 or 4       | 5V      |
+| DAC VIN             | VIN  | Pin 2 or 4       | 5V      |
+| DAC GND             | GND  | Pin 34           | GND     |
+| DAC DIN             | DIN  | Pin 40           | GPIO 21 |
+| DAC BCLK            | BCLK | Pin 12           | GPIO 18 |
+| DAC LRC             | LRC  | Pin 35           | GPIO 19 |
+| DAC SD              | SD   | Not connected    | (float) |
 | Station Encoder CLK | CLK  | Pin 11           | GPIO 17 |
 | Station Encoder DT  | DT   | Pin 13           | GPIO 27 |
 | Station Encoder SW  | SW   | Pin 15           | GPIO 22 |
@@ -154,12 +145,12 @@ KY-040 Encoder     Raspberry Pi
 
 1. **Use Dupont jumper wires** for prototyping - female-to-female for connecting to both Pi header and encoder pins
 
-2. **Solder header pins** to both MAX98357A boards if not pre-soldered
+2. **Solder header pins** to the MAX98357A board if not pre-soldered
 
 3. **Test audio first** before adding encoders:
 
    ```bash
-   speaker-test -t wav -c 2
+   speaker-test -t wav -c 1
    ```
 
 4. **Encoder orientation matters** - if rotation is reversed, swap CLK and DT wires
@@ -167,9 +158,13 @@ KY-040 Encoder     Raspberry Pi
 5. **Secure connections** - hot glue or heat shrink tubing prevents wires from loosening
 
 6. **Power considerations**:
-   - Use a quality 5V 2.5A+ power supply (or higher for stereo setup)
+   - Use a quality 5V 2.5A+ power supply
    - If experiencing audio crackling, try a better power supply
-   - Both MAX98357A boards draw power from 5V, encoders from 3.3V
+   - MAX98357A draws power from 5V, encoders from 3.3V
+
+7. **Volume limit for vintage speakers**:
+   - If using a 1.6W speaker, keep volume below 60% to avoid damage
+   - The MAX98357A can output up to 3W, which would overdrive a 1.6W speaker
 
 ### Physical Layout Example
 
@@ -187,17 +182,15 @@ KY-040 Encoder     Raspberry Pi
 │              │   Zero 2 W   │               │
 │              └──────┬───────┘               │
 │                     │                       │
-│         ┌──────────┬┴─────────┐             │
-│         │          │          │             │
-│   ┌─────┴─────┐    │   ┌──────┴────┐        │
-│   │ MAX98357A │    │   │ MAX98357A │        │
-│   │  (LEFT)   │    │   │  (RIGHT)  │        │
-│   └─────┬─────┘    │   └─────┬─────┘        │
-│         │          │         │              │
-│   ┌─────┴─────┐    │   ┌─────┴─────┐        │
-│   │  Speaker  │    │   │  Speaker  │        │
-│   │   (L)     │    │   │    (R)    │        │
-│   └───────────┘    │   └───────────┘        │
+│              ┌──────┴──────┐                │
+│              │  MAX98357A  │                │
+│              │   (MONO)    │                │
+│              └──────┬──────┘                │
+│                     │                       │
+│           ┌─────────┴─────────┐             │
+│           │  Vintage Speaker  │             │
+│           │    (4Ω 1.6W)      │             │
+│           └───────────────────┘             │
 │                                             │
 └─────────────────────────────────────────────┘
 ```
@@ -347,7 +340,9 @@ journalctl -u fallout-radio -f
 ### Physical Controls
 
 - **Station Encoder**: Rotate to switch stations (button does nothing)
-- **Volume Encoder**: Rotate to adjust volume, press to toggle power on/off
+- **Volume Encoder**: Rotate to adjust volume. Power is controlled by volume:
+  - Turn volume to 0 → Radio turns off
+  - Turn volume up from 0 → Radio turns on (resumes last station)
 
 ## Configuration
 
@@ -385,6 +380,7 @@ Example:
 Settings are stored in `data/settings.json`:
 
 - `default_volume`: Initial volume (0-100), default: 40
+- `max_volume`: Maximum volume limit (1-100), default: 100. Use to protect low-wattage speakers (e.g., 60 for a 1.6W speaker with 3W amp)
 - `static_volume`: Tuning static volume as percentage of main volume (0-100), default: 60
 - `wrap_stations`: Whether to wrap around when reaching first/last station, default: true
 - `loudness_normalization`: EBU R128 loudness normalization for consistent volume across stations, default: true
@@ -448,11 +444,11 @@ fallout-radio/
 
 ### No audio output
 
-1. Check I2S DAC wiring on both boards
+1. Check I2S DAC wiring
 2. Verify `dtoverlay=max98357a` in config.txt
 3. Reboot after config changes
-4. Test with: `speaker-test -t wav -c 2`
-5. Verify SD pin connections: LEFT DAC to GND, RIGHT DAC to VIN
+4. Test with: `speaker-test -t wav -c 1`
+5. Ensure SD pin is floating (not connected) for mono output
 
 ### YouTube streams not working
 

@@ -618,13 +618,23 @@ async function confirmDeleteStation() {
 function initSettingsPage() {
     loadSettings();
 
-    // Volume slider
+    // Default volume slider
     const volumeSlider = document.getElementById('default-volume');
     const volumeValue = document.getElementById('default-volume-value');
 
     if (volumeSlider && volumeValue) {
         volumeSlider.addEventListener('input', (e) => {
             volumeValue.textContent = e.target.value;
+        });
+    }
+
+    // Max volume slider
+    const maxVolumeSlider = document.getElementById('max-volume');
+    const maxVolumeValue = document.getElementById('max-volume-value');
+
+    if (maxVolumeSlider && maxVolumeValue) {
+        maxVolumeSlider.addEventListener('input', (e) => {
+            maxVolumeValue.textContent = e.target.value;
         });
     }
 
@@ -653,6 +663,12 @@ async function loadSettings() {
         if (volumeSlider) volumeSlider.value = settings.default_volume;
         if (volumeValue) volumeValue.textContent = settings.default_volume;
 
+        const maxVolumeSlider = document.getElementById('max-volume');
+        const maxVolumeValue = document.getElementById('max-volume-value');
+
+        if (maxVolumeSlider) maxVolumeSlider.value = settings.max_volume ?? 100;
+        if (maxVolumeValue) maxVolumeValue.textContent = settings.max_volume ?? 100;
+
         const staticSlider = document.getElementById('static-volume');
         const staticValue = document.getElementById('static-volume-value');
 
@@ -668,12 +684,14 @@ async function loadSettings() {
 
 async function saveSettings() {
     const volumeSlider = document.getElementById('default-volume');
+    const maxVolumeSlider = document.getElementById('max-volume');
     const staticSlider = document.getElementById('static-volume');
     const loudnessCheckbox = document.getElementById('loudness-normalization');
     const statusEl = document.getElementById('settings-status');
 
     const settings = {
         default_volume: parseInt(volumeSlider?.value || 50),
+        max_volume: parseInt(maxVolumeSlider?.value || 100),
         static_volume: parseInt(staticSlider?.value || 75),
         loudness_normalization: loudnessCheckbox?.checked ?? false
     };

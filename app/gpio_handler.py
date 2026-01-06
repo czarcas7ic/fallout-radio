@@ -170,9 +170,12 @@ class GPIOHandler:
         self._radio_core.set_volume(new_volume)
 
     def _on_volume_button(self) -> None:
-        """Handle volume encoder button press (power toggle)."""
-        logger.debug("Volume button pressed - toggling power")
-        self._radio_core.toggle_power()
+        """Handle volume encoder button press (no action - power is controlled by volume knob)."""
+        # Power on/off is now controlled by twisting the volume knob:
+        # - Volume to 0 = turn off
+        # - Volume up from 0 = turn on
+        logger.debug("Volume button pressed - no action (power controlled via volume knob)")
+        pass
 
     # === Lifecycle ===
 
