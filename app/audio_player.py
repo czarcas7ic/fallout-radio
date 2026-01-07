@@ -293,19 +293,16 @@ class AudioPlayer:
             if self._mpv_process is None:
                 break
 
-            # Query eof-reached FIRST, before checking if process exited
-            # This prevents race condition where mpv exits after EOF before we can detect it
-            eof = self._send_mpv_command(["get_property", "eof-reached"])
-            if eof and eof.get("data") is True:
-                eof_reached = True
-
             # Check if process is still running
-            if self._mpv_process.poll() is not None:
+            exit_code = self._mpv_process.poll()
+            if exit_code is not None:
                 with self._status_lock:
                     if self._status != StreamStatus.STOPPED:
-                        if eof_reached:
+                        # Use exit code OR eof_reached flag to determine if this was normal completion
+                        # mpv returns 0 on successful playback (including EOF)
+                        if eof_reached or exit_code == 0:
                             # Normal end of playback
-                            logger.info("Playback ended (EOF reached)")
+                            logger.info(f"Playback ended (EOF reached={eof_reached}, exit_code={exit_code})")
                             self._status = StreamStatus.STOPPED
                             self._notify_status_change()
                             # Notify callback in a separate thread to avoid blocking
@@ -316,7 +313,7 @@ class AudioPlayer:
                                 ).start()
                         else:
                             self._status = StreamStatus.ERROR
-                            logger.warning("mpv process exited unexpectedly")
+                            logger.warning(f"mpv process exited unexpectedly (exit_code={exit_code})")
                             self._notify_status_change()
                 break
 
@@ -325,6 +322,7 @@ class AudioPlayer:
             buffering = self._send_mpv_command(["get_property", "paused-for-cache"])
             idle = self._send_mpv_command(["get_property", "core-idle"])
             time_pos = self._send_mpv_command(["get_property", "time-pos"])
+            eof = self._send_mpv_command(["get_property", "eof-reached"])
 
             old_status = self._status
 
@@ -332,6 +330,10 @@ class AudioPlayer:
             is_buffering = buffering and buffering.get("data") is True
             is_idle = idle and idle.get("data") is True
             has_position = time_pos and time_pos.get("data") is not None and time_pos.get("data") > 0
+
+            # Track if EOF has been reached (for when process exits)
+            if eof and eof.get("data") is True:
+                eof_reached = True
 
             with self._status_lock:
                 if is_paused or is_buffering or is_idle or not has_position:
