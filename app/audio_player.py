@@ -306,11 +306,14 @@ class AudioPlayer:
                             self._status = StreamStatus.STOPPED
                             self._notify_status_change()
                             # Notify callback in a separate thread to avoid blocking
+                            logger.info(f"Callback registered: {self._playback_ended_callback is not None}")
                             if self._playback_ended_callback:
+                                logger.info("Starting callback thread...")
                                 threading.Thread(
                                     target=self._playback_ended_callback,
                                     daemon=True
                                 ).start()
+                                logger.info("Callback thread started")
                         else:
                             self._status = StreamStatus.ERROR
                             logger.warning(f"mpv process exited unexpectedly (exit_code={exit_code})")
