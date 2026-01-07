@@ -293,38 +293,49 @@ class RadioCore:
 
     def _on_playback_ended(self) -> None:
         """Called when audio playback ends naturally (EOF). Restarts non-live streams."""
-        # Gather info while holding lock, but release before blocking calls
-        station_url = None
-        station_name = None
+        try:
+            logger.info("_on_playback_ended callback triggered")
 
-        with self._lock:
-            if self._current_station_index <= 0:
-                return  # Not playing a station
+            # Gather info while holding lock, but release before blocking calls
+            station_url = None
+            station_name = None
 
-            # Get current station
-            active_pack = self._get_pack_by_id(self._active_pack_id) if self._active_pack_id else None
-            if not active_pack:
-                return
+            with self._lock:
+                logger.debug(f"Current station index: {self._current_station_index}")
+                if self._current_station_index <= 0:
+                    logger.info("Not playing a station, skipping restart")
+                    return  # Not playing a station
 
-            station_idx = self._current_station_index - 1  # Convert to 0-based
-            if station_idx < 0 or station_idx >= len(active_pack.stations):
-                return
+                # Get current station
+                active_pack = self._get_pack_by_id(self._active_pack_id) if self._active_pack_id else None
+                if not active_pack:
+                    logger.warning("No active pack, skipping restart")
+                    return
 
-            station = active_pack.stations[station_idx]
-            station_url = station.url
-            station_name = station.name
+                station_idx = self._current_station_index - 1  # Convert to 0-based
+                if station_idx < 0 or station_idx >= len(active_pack.stations):
+                    logger.warning(f"Invalid station index {station_idx}, skipping restart")
+                    return
 
-            # Check if this is a non-live stream (has a duration)
-            duration = self._audio_player.get_video_duration(station_url)
-            if duration is None:
-                # Live stream shouldn't end, but if it does, don't auto-restart
-                logger.warning(f"Live stream ended unexpectedly: {station_name}")
-                return
+                station = active_pack.stations[station_idx]
+                station_url = station.url
+                station_name = station.name
 
-        # Restart from the beginning for non-live content
-        # Done outside the lock to avoid blocking user interactions during network calls
-        logger.info(f"Restarting non-live station from beginning: {station_name}")
-        self._audio_player.play_url(station_url, start_position=0)
+                # Check if this is a non-live stream (has a duration)
+                duration = self._audio_player.get_video_duration(station_url)
+                logger.debug(f"Station duration: {duration}")
+                if duration is None:
+                    # Live stream shouldn't end, but if it does, don't auto-restart
+                    logger.warning(f"Live stream ended unexpectedly: {station_name}")
+                    return
+
+            # Restart from the beginning for non-live content
+            # Done outside the lock to avoid blocking user interactions during network calls
+            logger.info(f"Restarting non-live station from beginning: {station_name}")
+            self._audio_player.play_url(station_url, start_position=0)
+            logger.info(f"Restart initiated for {station_name}")
+        except Exception as e:
+            logger.error(f"Error in _on_playback_ended: {e}", exc_info=True)
 
     def register_state_callback(self, callback: Callable[[], None]) -> None:
         """Register a callback to be called on state changes."""
