@@ -296,6 +296,9 @@ class AudioPlayer:
             # Check if process is still running
             exit_code = self._mpv_process.poll()
             if exit_code is not None:
+                should_notify = False
+                should_call_ended_callback = False
+
                 with self._status_lock:
                     if self._status != StreamStatus.STOPPED:
                         # Use exit code OR eof_reached flag to determine if this was normal completion
@@ -304,24 +307,23 @@ class AudioPlayer:
                             # Normal end of playback
                             logger.info(f"Playback ended (EOF reached={eof_reached}, exit_code={exit_code})")
                             self._status = StreamStatus.STOPPED
-                            logger.info("Notifying status change...")
-                            self._notify_status_change()
-                            logger.info("Status change notified")
-                            # Notify callback in a separate thread to avoid blocking
-                            logger.info(f"Callback registered: {self._playback_ended_callback is not None}")
-                            if self._playback_ended_callback:
-                                logger.info("Starting callback thread...")
-                                threading.Thread(
-                                    target=self._playback_ended_callback,
-                                    daemon=True
-                                ).start()
-                                logger.info("Callback thread started")
-                            else:
-                                logger.warning("No playback ended callback registered!")
+                            should_notify = True
+                            should_call_ended_callback = self._playback_ended_callback is not None
                         else:
                             self._status = StreamStatus.ERROR
                             logger.warning(f"mpv process exited unexpectedly (exit_code={exit_code})")
-                            self._notify_status_change()
+                            should_notify = True
+
+                # Release lock BEFORE calling callbacks to avoid deadlock
+                # (callbacks may call get_stream_status which needs the lock)
+                if should_notify:
+                    self._notify_status_change()
+                if should_call_ended_callback:
+                    logger.info("Starting playback ended callback...")
+                    threading.Thread(
+                        target=self._playback_ended_callback,
+                        daemon=True
+                    ).start()
                 break
 
             # Query playback status
